@@ -1,0 +1,22 @@
+﻿<Window x:Class="HotKeySystem_example.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:HotKeySystem_example.ViewModels"
+        Title="MainWindow" Height="350" Width="525">
+    <Window.InputBindings>
+        <KeyBinding Modifiers="{Binding ShowHelp.KeyHotKey.KeyGesture.Modifiers}" Key="{Binding ShowHelp.KeyHotKey.KeyGesture.Key}" Command="{Binding ShowHelp}" />
+        <KeyBinding Modifiers="{Binding FancyBegruessung.KeyHotKey.KeyGesture.Modifiers}" Key="{Binding FancyBegruessung.KeyHotKey.KeyGesture.Key}" Command="{Binding FancyBegruessung}" />
+    </Window.InputBindings>
+    <Grid>
+        <TextBlock HorizontalAlignment="Left"
+                   Margin="159,104,0,0"
+                   TextWrapping="Wrap"
+                   Text="Fancy Begrüßung von Johannes Winkler :P"
+                   VerticalAlignment="Top"
+                   FontFamily="Georgia"
+                   Background="AliceBlue"
+                   Padding="40"
+                   Width="200" 
+                   Visibility="{Binding FancyBegruessungVisibility}"/>
+    </Grid>
+</Window>

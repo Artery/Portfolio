@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="HotKeySystem_example.Properties" GeneratedClassName="HotKeySettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ShowHelpCommandKeyHotKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">F1</Value>
+    </Setting>
+    <Setting Name="FancyBegruessungCommandKeyHotKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Control+B</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
