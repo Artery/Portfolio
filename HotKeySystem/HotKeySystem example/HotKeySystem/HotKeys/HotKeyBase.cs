@@ -13,6 +13,11 @@ namespace HotKeySystem_example.HotKeySystem
         //Description what the HotKeyNEW does e.g.: 'Close current project'
         public virtual string Description { get; set; }
 
+        public virtual string Tooltip
+        {
+            get { return Description + " (" + HotKeyDisplayString + ")"; }
+        }
+
         public virtual T CreateGestureFromString<T>(string gestureString)
             where T : InputGesture
         {
