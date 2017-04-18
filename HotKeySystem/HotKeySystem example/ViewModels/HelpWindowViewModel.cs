@@ -66,33 +66,46 @@ namespace HotKeySystem_example.ViewModels
             var groupedHotkeys = new Dictionary<string, List<HotKeyInfo>>();
             var tabs = new List<HotKeyCategoryTab>();
             var hotkeys = Properties.HotKeySettings.Default.Properties;
-                //MapEditorHotKeyProvider.Instance.HotKeys;
 
             foreach (SettingsProperty item in hotkeys)
             {
                 var commandName = item.Name.Split(new string[] { "Command" }, StringSplitOptions.RemoveEmptyEntries)[0] + "Command";
+
                 var displayString = HotKeyLocalizer.LocalizeDisplayString(new SettingsPropertyValue(item).PropertyValue as string);
                 var description = Properties.HotKeysDescriptions.ResourceManager.GetString(commandName);
                 var category = Properties.HotKeysCategories.ResourceManager.GetString(commandName);
-                
+
                 if (description != null && category != null)
                 {
-                    var hotkeyInfo = new HotKeyInfo(displayString, description);
+                    //Extension for Commands with multiple HotKeys
+                    var splittedDisplayString = displayString.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                    var splittedDescription = description.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                    var splittedCategory = category.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 
-                    //Create new HotKeyCategory, if not existing
-                    if (!groupedHotkeys.ContainsKey(category))
+                    var hotkeyInfoData = splittedDisplayString.Zip(
+                        splittedDescription.Zip(splittedCategory, (desc, cat) => new Tuple<string, string>(desc, cat)),
+                        (dispStr, desc_cat) => new Tuple<string, string, string>(dispStr, desc_cat.Item1, desc_cat.Item2));
+
+                    //item1 = displayString, item2 = description, item3 = category
+                    foreach (var hotkeyInfoDate in hotkeyInfoData)
                     {
-                        groupedHotkeys.Add(category, new List<HotKeyInfo>());
-                        tabs.Add(new HotKeyCategoryTab(category,
-                            CollectionViewSource.GetDefaultView(groupedHotkeys[category])));
-                    }
+                        var hotkeyInfo = new HotKeyInfo(hotkeyInfoDate.Item1, hotkeyInfoDate.Item2);
 
-                    groupedHotkeys[category].Add(hotkeyInfo);
+                        //Create new HotKeyCategory, if not existing
+                        if (!groupedHotkeys.ContainsKey(hotkeyInfoDate.Item3))
+                        {
+                            groupedHotkeys.Add(hotkeyInfoDate.Item3, new List<HotKeyInfo>());
+                            tabs.Add(new HotKeyCategoryTab(hotkeyInfoDate.Item3,
+                                CollectionViewSource.GetDefaultView(groupedHotkeys[hotkeyInfoDate.Item3])));
+                        }
 
-                    //Used to determine the with and tabs for the outputfile
-                    if (hotkeyInfo.DisplayString.Length > hotKeyDisplayStringMaxLength)
-                    {
-                        hotKeyDisplayStringMaxLength = hotkeyInfo.DisplayString.Length;
+                        groupedHotkeys[hotkeyInfoDate.Item3].Add(hotkeyInfo);
+
+                        //Used to determine the with and tabs for the outputfile
+                        if (hotkeyInfo.DisplayString.Length > hotKeyDisplayStringMaxLength)
+                        {
+                            hotKeyDisplayStringMaxLength = hotkeyInfo.DisplayString.Length;
+                        }
                     }
                 }
             }

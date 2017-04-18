@@ -7,10 +7,12 @@ namespace HotKeySystem_example.HotKeySystem
     {
         public static string LocalizeDisplayString(string displayString)
         {
-            var displayStringParts = displayString.Split(new string[] { "+" }, StringSplitOptions.RemoveEmptyEntries);
+            //+ is the delimiter for composite shortcuts like Control+S
+            //; is the delimiter for Commands with multiple hotkeys
+            var displayStringParts = displayString.Split(new string[] { "+", ";" }, StringSplitOptions.RemoveEmptyEntries);
 
             //Replace all substrings which could be localized
-            foreach(string substring in displayStringParts)
+            foreach (string substring in displayStringParts)
             {
                 var localizedString = Properties.LocalizedKeyNames.ResourceManager.GetString(substring);
 

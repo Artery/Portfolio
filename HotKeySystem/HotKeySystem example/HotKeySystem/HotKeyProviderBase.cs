@@ -23,17 +23,45 @@ namespace HotKeySystem_example.HotKeySystem
         public virtual T GetHotKey<T>(Type commandType)
             where T : HotKeyBase, new()
         {
-            var hotkey = m_HotKeys.FirstOrDefault<HotKeyBase>(item => item.CommandType.Equals(commandType) && item is T)
-                            ?? CreateHotKey<T>(commandType);
-            
-            if(hotkey == null)
+            var hotkey = m_HotKeys.FirstOrDefault(item => item.CommandType.Equals(commandType) && item is T) as T
+                            ?? CreateHotKey<T>(commandType) as T;
+
+            ValidateHotKey(commandType, hotkey);
+
+            return hotkey;
+        }
+
+        //Returns a list of existing hotkeys for the same commandType, otherwise tries to create it
+        public virtual List<T> GetHotKeys<T>(Type commandType)
+            where T : HotKeyBase, new()
+        {
+            var hotkeys = m_HotKeys.Where(item => item.CommandType.Equals(commandType) && item is T).Select(hotkey => hotkey as T).ToList();
+
+            if (hotkeys.Count == 0)
             {
-                throw new ArgumentNullException("HotKeyProviderBase - GetHotKey<" 
-                    + typeof(T).FullName + ">(" + commandType.FullName 
-                    + "): Fetching hotkey from internal List or trying to create it resulted in null argument!");
+                hotkeys = CreateMultipleHotKeys<T>(commandType);
             }
 
-            return hotkey as T;
+            foreach (var hotkey in hotkeys)
+            {
+                if (hotkey == null)
+                {
+                    ValidateHotKey(commandType, hotkey);
+                }
+            }
+
+            return hotkeys;
+        }
+
+        //Checks if a hotkey is valid or null, throws ArgumentNullException if null
+        protected virtual void ValidateHotKey<T>(Type commandType, T hotkey)
+        {
+            if (hotkey == null)
+            {
+                throw new ArgumentNullException("HotKeyProviderBase - GetHotKey<"
+                    + typeof(T).FullName + ">(" + commandType.FullName
+                    + "): Fetching hotkey from internal List or trying to create it resulted in null argument!");
+            }
         }
 
         //Returns exisiting hotkey, otherwise tries to create new one or returns default-value null
@@ -54,16 +82,16 @@ namespace HotKeySystem_example.HotKeySystem
             where T : HotKeyBase, new()
         {
             T hotkey = null;
-            
+
             try
             {
                 hotkey = GetHotKey<T>(commandType);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 LogManager.GetLogger("HotKeyProviderBase").Warn(
-                    GetWarnMessage("TryGetHotKey", commandType, typeof(T), e.Message) 
-                    + "\n" 
+                    GetWarnMessage("TryGetHotKey", commandType, typeof(T), e.Message)
+                    + "\n"
                     + GetDefaultTypeMessage(defaultReturnType));
             }
 
@@ -100,5 +128,6 @@ namespace HotKeySystem_example.HotKeySystem
 
 
         protected abstract T CreateHotKey<T>(Type commandType) where T : HotKeyBase, new();
+        protected abstract List<T> CreateMultipleHotKeys<T>(Type commandType) where T : HotKeyBase, new();
     }
 }
