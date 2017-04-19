@@ -12,13 +12,11 @@ public class ChangeLayerOrderCommand
     //True will lead to increasing, false to decreasing order
     public void Execute(bool increaseLayerOrder)
     {
-        //What LayerTool, ClientViewModel and project are exactly isn't important for this example
-        var project = m_LayerTool.ClientViewModel.Project;
-        var selectedLayer = project.SelectedMapLayer;
-        var showInactiveLayers = project.ShowInactiveLayers;
-        var mapLayers = project.MapLayers;
+        var selectedLayer = Project.SelectedLayer;
+        var showInactiveLayers = Project.ShowInactiveLayers;
+        var layers = Project.Layers;
 
-        var orderedLayers = increaseLayerOrder ? mapLayers.OrderBy(l => l.ZValue) : mapLayers.OrderByDescending(l => l.ZValue);
+        var orderedLayers = increaseLayerOrder ? layers.OrderBy(l => l.ZValue) : layers.OrderByDescending(l => l.ZValue);
 
         //Delegate to compare two ints
         Func<int, int, bool, bool> compareValues = (lhs, rhs, greater) => greater ? lhs > rhs : lhs < rhs;
@@ -46,7 +44,7 @@ public class ChangeLayerOrderCommand
 
         if (lastLayerToSwap != null || showInactiveLayers)
         {
-            var zValues = mapLayers.Select(l => l.ZValue).DefaultIfEmpty(0);
+            var zValues = layers.Select(l => l.ZValue).DefaultIfEmpty(0);
             var fallbackZValueBound = increaseLayerOrder ? zValues.Max() + 1 : zValues.Min() - 1;
 
             var zValueBound = lastLayerToSwap != null ? lastLayerToSwap.ZValue : fallbackZValueBound;
@@ -68,9 +66,9 @@ public class ChangeLayerOrderCommand
             }
         }
 
-        if (m_LayerTool.ClientViewModel.MapTool.SynchronizeSelectedLayer)
+        if (Project.SynchronizeSelectedLayer)
         {
-            m_LayerTool.ClientViewModel.Project.UpdateLayers();
+            Project.UpdateLayers();
         }
     }
 
